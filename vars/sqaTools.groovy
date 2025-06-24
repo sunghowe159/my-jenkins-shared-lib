@@ -32,47 +32,57 @@ def cicd(Map config = [:], Closure pipeline = {}) {
     ]
 
     this.binding.setVariable('cicd_config', cicd_config)
-
-    node(cicd_config.nodeLabel) {
+    cicd_code = {
         withCredentials(cicd_config.credentials) {
             def capturedException = null
-            try {
-                runWithDockerIfNeeded(cicd_config) {
-                    pipeline.call()
-                }
-                if (!currentBuild.result) {
-                    currentBuild.result = 'SUCCESS'
-                }
-            } catch (e) {
-                currentBuild.result = 'FAILURE'
-                capturedException = e
-                handleError(e)
-                throw e
-            } finally {
-                if (cicd_config.archiveArtifacts?.trim()) {
-                    archiveArtifacts artifacts: cicd_config.archiveArtifacts, allowEmptyArchive: true
-                }
+            try_pipeline = {
+                try {
+                    pipeline() 
+                    if (!currentBuild.result) {
+                        currentBuild.result = 'SUCCESS'
+                    }
+                } catch (e) {
+                    currentBuild.result = 'FAILURE'
+                    capturedException = e
+                    handleError(e)
+                    throw e
+                } finally {
+                    if (cicd_config.archiveArtifacts?.trim()) {
+                        archiveArtifacts artifacts: cicd_config.archiveArtifacts, allowEmptyArchive: true
+                    }
 
-                // 成功 / 非失败状态，也发送一次结果通知
-                if (currentBuild.result != 'FAILURE') {
-                    notifyResult(type: currentBuild.result, error: capturedException)
+                    // 成功 / 非失败状态，也发送一次结果通知
+                    if (currentBuild.result != 'FAILURE') {
+                        notifyResult(type: currentBuild.result, error: capturedException)
+                    }
                 }
             }
+            if(cicd_config.dockerImage) {
+                runWithDocker(cicd_config) {
+                    try_pipeline()
+                }
+            } else {
+                try_pipeline()
+            }
+            
         }
+    }
+
+    node(cicd_config.nodeLabel) {
+        cicd_code()
     }
 }
 
 
 /**
- * 根据配置决定是否使用 docker 容器运行闭包
+ * 使用 docker 容器运行流水线
  */
-def runWithDockerIfNeeded(Map config, Closure body) {
-    if (config.dockerImage?.trim()) {
+def runWithDocker(Map config, Closure pipeline) {
+    docker.withRegistry('https://registry.example.com', 'credentials-id') {
+        docker.image(config.dockerImage).pull() // 确保拉取最新镜像
         docker.image(config.dockerImage).inside(config.dockerArgs ?: '') {
-            body()
+            pipeline()
         }
-    } else {
-        body()
     }
 }
 
@@ -81,9 +91,9 @@ def runWithDockerIfNeeded(Map config, Closure body) {
  * 可扩展为发送通知等
  */
 def handleError(Exception err) {
-    echo "❌ 构建失败：${err?.getMessage() ?: '未知异常'}"
+    echo "❌ 构建失败：${err?.getMessage() ?: 'Unknown Error'}"
 
-    // 👉 可扩展：写入日志系统、统计系统、清理逻辑等
+    // 可扩展：写入日志系统、统计系统、清理逻辑等
     // sendToLogSystem(err)
     // markBuildStatusInSystem('FAILURE')
 

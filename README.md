@@ -122,3 +122,14 @@ Docker 运行环境只会在 node 环境内创建，保证执行环境稳定。
 自动管理和注入凭证，结合 Jenkins Folder 级配置。
 
 增强流水线参数化支持，实现更灵活配置。
+
+## 9. 参考文档
+[Jenkins用户手册](https://www.jenkins.io/doc/book/getting-started/)
+
+[Groovy文档](https://groovy-lang.org/documentation.html)
+
+[Using Docker With Pipeline](https://www.jenkins.io/doc/book/pipeline/docker/)
+
+[Pipeline Steps Reference](https://www.jenkins.io/doc/pipeline/steps/)
+
+[Scripted Pipeline简介](https://www.jenkins.io/doc/book/pipeline/syntax/#scripted-pipeline)
