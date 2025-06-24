@@ -99,29 +99,20 @@ sqaTools.notifyResult(type: 'UNSTABLE', error: err)
 无需用户在 Jenkinsfile 中手动处理结果判断。
 ## 5. sqaTools_CodeSync 使用说明
 > 通用 GitLab 代码拉取工具，支持单仓和多仓（并发）拉取，适配 Merge Request 场景与普通分支构建。详情见文档：[sqaTools_CodeSync](docs/RepoSync.md)
-## 6. 环境变量建议
+## 6. sqaTools_RunCmd 适用说明
+> 封装 Jenkins 原生 sh / bat，可直接传入字符串或参数 Map，支持多行命令、返回结果等。详情见文档：[sqaTools_RunCmd](docs/RunCmd.md)
+## 7. 环境变量建议
 ```groovy
 // 配置收件人
 env.NOTIFY_EMAIL_TO = 'ci-team@example.com'
 ```
 或在 Jenkins 系统/文件夹级别统一配置变量。
-## 7. 注意事项
+## 8. 注意事项
 pipeline 参数的闭包体需遵循 Scripted Pipeline 语法（支持 stage、timeout、sh 等标准步骤）。
 
 Docker 运行环境只会在 node 环境内创建，保证执行环境稳定。
 
 构建产物归档会在流水线完成后执行，无论成功还是失败，确保产物不会丢失。
-
-## 8. 未来扩展TODO
-增加统一日志输出和阶段封装工具，如 runStage 等。
-
-扩展错误处理，内置多渠道通知模块。
-
-支持多语言、多构建环境的模板分发。
-
-自动管理和注入凭证，结合 Jenkins Folder 级配置。
-
-增强流水线参数化支持，实现更灵活配置。
 
 ## 9. 参考文档
 [Jenkins用户手册](https://www.jenkins.io/doc/book/getting-started/)
