@@ -1,0 +1,12 @@
+repos:
+  - name: common-lib
+    url: https://gitlab.example.com/shared/common-lib.git
+    branch: main
+
+  - name: backend
+    url: https://gitlab.example.com/services/backend.git
+    branch: develop
+
+  - name: frontend
+    url: https://gitlab.example.com/ui/frontend.git
+    branch: release/v1.0

@@ -12,6 +12,7 @@
 - 异常捕获与统一处理（`handleError()`）
 - 构建产物归档（可配置归档路径）
 - 构建结果通知（`notifyResult()`，支持 SUCCESS、FAILURE、ABORTED、UNSTABLE 等）
+- Gitlab代码拉取，包括单仓库和多仓库（sqaTools_CodeSync）
 
 该模板旨在为 Jenkins 流水线提供统一的执行环境封装，提升复用和可维护性。
 
@@ -48,7 +49,7 @@ sqaTools.cicd([
     }
 }
 ```
-## 3. 配置参数说明
+### 2.3 模板配置参数说明
 |参数	|类型	|说明	|默认值|
 |--|--|--|--|
 |nodeLabel|	String	|Jenkins 执行节点标签|	'build-node'
@@ -56,11 +57,11 @@ sqaTools.cicd([
 |dockerArgs|	String	|Docker 运行参数，如挂载缓存目录等	|''
 |credentials|	List	|Jenkins 凭证列表（支持多种类型）|	[]
 |archiveArtifacts|	String	|构建产物归档路径，支持通配符，逗号分隔|	''
-## 4. 错误处理
+## 3. 错误处理
 模板内置了异常捕获机制，捕获到异常时会打印错误日志，并自动标记构建状态为失败 (FAILURE)。
 
 默认错误处理在 handleError 函数内实现，用户可根据需要扩展该方法，集成通知（飞书、Slack、邮件等）。
-### 4.1 handleError(Exception err)
+### 3.1 handleError(Exception err)
 模板内部封装的异常处理函数，在流水线异常时被调用，作用包括：
 
 捕获错误日志；
@@ -70,7 +71,8 @@ sqaTools.cicd([
 保留扩展点（如记录错误到日志系统、触发飞书通知等）；
 
 保留 handleError() 是为了未来对异常处理进行统一增强。
-### 4.2 notifyResult(Map args = [:])
+## 4. 构建结果通知
+### 4.1 notifyResult(Map args = [:])
 用于发送构建结果通知，支持所有 Jenkins 构建状态：
 
 参数	说明
@@ -84,7 +86,7 @@ to	收件人邮箱（默认取 NOTIFY_EMAIL_TO）
 ```groovy
 sqaTools.notifyResult(type: 'UNSTABLE', error: err)
 ```
-### 4.3 模板中行为自动化说明
+### 4.2 模板中通知行为自动化说明
 模板中已自动集成结果判断与通知逻辑：
 
 |场景	|行为|
@@ -95,21 +97,22 @@ sqaTools.notifyResult(type: 'UNSTABLE', error: err)
 |设置 UNSTABLE	|自动发送不稳定通知|
 
 无需用户在 Jenkinsfile 中手动处理结果判断。
-## 5. 环境变量建议
-通过环境变量配置收件人：
-
+## 5. sqaTools_CodeSync 使用说明
+> 通用 GitLab 代码拉取工具，支持单仓和多仓（并发）拉取，适配 Merge Request 场景与普通分支构建。详情见文档：[sqaTools_CodeSync](docs/RepoSync.md)
+## 6. 环境变量建议
 ```groovy
+// 配置收件人
 env.NOTIFY_EMAIL_TO = 'ci-team@example.com'
 ```
 或在 Jenkins 系统/文件夹级别统一配置变量。
-## 6. 注意事项
+## 7. 注意事项
 pipeline 参数的闭包体需遵循 Scripted Pipeline 语法（支持 stage、timeout、sh 等标准步骤）。
 
 Docker 运行环境只会在 node 环境内创建，保证执行环境稳定。
 
 构建产物归档会在流水线完成后执行，无论成功还是失败，确保产物不会丢失。
 
-## 7. 未来扩展TODO
+## 8. 未来扩展TODO
 增加统一日志输出和阶段封装工具，如 runStage 等。
 
 扩展错误处理，内置多渠道通知模块。

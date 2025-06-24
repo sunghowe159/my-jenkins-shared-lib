@@ -9,14 +9,10 @@ sqaTools.cicd([
     ],
     archiveArtifactsPatterns: 'build/libs/*.jar, reports/**/*.html'
 ]) {
-    timeout(time: 30, unit: 'MINUTES') {
-        stage('Checkout') {
-            sh '''
-                git clone https://$GIT_USER:$GIT_PASS@git.example.com/my/repo.git
-            '''
-        }
-        stage('Test') {
-            sh 'pytest tests/'
-        }
+    stage('Hello') {
+        echo "Hello, Jenkins!"
+        sh '''
+            echo "This is a CI/CD pipeline example using Docker."
+        '''
     }
 }
