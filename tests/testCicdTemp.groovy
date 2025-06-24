@@ -1,10 +1,8 @@
 @Library('my-jenkins-shared-lib') _
 
-// This Jenkins pipeline is used to test the sqaTools.cicd function with Docker.
+// This Jenkins pipeline is used to test the sqaTools.cicd function without Docker.
 sqaTools.cicd([
     nodeLabel: 'ci-x86',
-    dockerImage: 'python:3.10-slim',
-    dockerArgs: '-v /cache:/root/.cache',
     archiveArtifacts: 'build/*.log, output/**/*.txt'
 ]) {
     stage('Hello') {
@@ -14,14 +12,14 @@ sqaTools.cicd([
         echo "Building the project..."
         sh '''
         echo "This is a build stage."
-        echo "Build completed in Docker!" > build/build_result.txt
+        echo "Build completed!" > build/build_result.txt
         '''
     }
     stage('Test') {
         echo "Running tests..."
         sh '''
         echo "This is a test stage."
-        echo "Tests passed in Docker!" > output/test_result.txt
+        echo "Tests passed!" > output/test_result.txt
         '''
     }
 }
