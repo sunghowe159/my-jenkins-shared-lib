@@ -1,7 +1,7 @@
 @Library('my-jenkins-shared-lib') _
 
-// This Jenkins pipeline is used to test the sqaTools.cicd function without Docker.
-sqaTools.cicd([
+// This Jenkins pipeline is used to test the customPipeline.cicd function without Docker.
+customPipeline.run([
     nodeLabel: 'ci-x86',
     archiveArtifacts: 'build/*.log, output/**/*.txt'
 ]) {

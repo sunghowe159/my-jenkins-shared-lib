@@ -1,4 +1,4 @@
-# `sqaTools_RunCmd` - 跨平台命令执行封装
+# `runCmd` - 跨平台命令执行封装
 
 封装 Jenkins 原生 `sh` / `bat`，可直接传入字符串或参数 Map，支持多行命令、返回结果等。
 
@@ -7,11 +7,11 @@
 ## 基本用法
 
 ```groovy
-sqaTools_RunCmd('echo "Hello Jenkins"')
+runCmd('echo "Hello Jenkins"')
 ```
 ### 支持多行语句
 ```groovy
-sqaTools_RunCmd('''
+runCmd('''
 echo "Step 1"
 echo "Step 2"
 pwd
@@ -29,7 +29,7 @@ pwd
 ##  示例
 ### 获取输出结果
 ```groovy
-def version = sqaTools_RunCmd([
+def version = runCmd([
   script: 'python --version',
   returnStdout: true
 ])
@@ -38,14 +38,14 @@ echo "当前 Python 版本：${version}"
 ###  忽略命令失败不中断
 默认情况下命令失败将终止流水线。通过 ignoreError: true 来让构建继续执行
 ```groovy
-sqaTools_RunCmd([
+runCmd([
   script: 'exit 1',
   ignoreError: true
 ])
 ```
 ###  Windows 平台示例
 ```groovy
-sqaTools_RunCmd([
+runCmd([
   script: '''
     echo "Windows 上执行命令"
     dir

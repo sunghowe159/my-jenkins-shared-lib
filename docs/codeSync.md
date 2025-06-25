@@ -1,4 +1,4 @@
-# sqaTools_CodeSync 使用说明
+# codeSync 使用说明
 >PS: 适用Gitlab，待开发Gerrit版本
 
 > 通用 GitLab 代码拉取工具，支持单仓和多仓（并发）拉取，适配 Merge Request 场景与普通分支构建。
@@ -24,21 +24,21 @@
 ## 3. 使用示例
 ```groovy
 // 拉取单个仓库
-sqaTools_CodeSync([
+codeSync([
   repoUrl: 'https://gitlab.example.com/backend/service.git',
   branch: 'release-v2.0',
   credentialsId: 'gitlab-token'
 ])
 // Merge Request场景
-sqaTools_CodeSync([
+codeSync([
   repoUrl: 'https://gitlab.example.com/backend/service.git',
   isMr: true,
   mrSourceBranch: env.gitlabSourceBranch,
   credentialsId: 'gitlab-token'
 ])
 // 拉取多个仓库（并发）
-sqaTools_CodeSync([
-  manifest: 'manifest/gitlab-manifest.yaml',
+codeSync([
+  manifest: 'resources/manifest/gitlab-manifest.yaml',
   credentialsId: 'gitlab-token'
 ])
 ```

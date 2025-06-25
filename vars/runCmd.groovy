@@ -1,5 +1,5 @@
 /**
- * sqaTools_RunCmd.groovy
+ * runCmd.groovy
  *
  * 跨平台命令封装，等价于 sh/bat，支持：
  * - 多行脚本

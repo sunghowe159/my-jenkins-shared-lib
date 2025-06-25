@@ -1,4 +1,4 @@
-// vars/sqaTools.groovy
+// vars/customPipeline.groovy
 
 /**
  * 主流水线模板函数
@@ -11,7 +11,7 @@
  *        archiveArtifacts: 构建产物归档路径，空则不归档
  * @param pipeline Closure 具体流水线逻辑，遵守脚本式Pipeline规范
  */
-def cicd(Map config = [:], Closure pipeline = {}) {
+def run(Map config = [:], Closure pipeline = {}) {
     def defaultConfig = [
         nodeLabel: 'build-node',
         dockerImage: '',

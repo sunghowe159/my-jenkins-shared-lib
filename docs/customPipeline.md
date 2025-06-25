@@ -1,6 +1,6 @@
 # 流水线模板介绍
 
-`sqaTools` 是基于 Jenkins Scripted Pipeline 的流水线工具，统一封装了以下功能：
+`customPipeline` 是基于 Jenkins Scripted Pipeline 的流水线工具，统一封装了以下功能：
 
 - [提供一套 Pipeline 代码模板](#21-流水线模板)
 - [流水线错误处理](#22-错误处理)
@@ -12,10 +12,10 @@
 
 - 该模板旨在为 Jenkins 流水线提供统一的执行环境封装，提升复用和可维护性。
 - 函数名：
-`def cicd(Map config = [:], Closure pipeline = {})`
+`def run(Map config = [:], Closure pipeline = {})`
 - 调用流水线模板，流水线主体代码需符合 Scripted Pipeline 语法规范。
     ```groovy
-    sqaTools.cicd([
+    customPipeline.run([
         nodeLabel: 'ci-node-label',
         dockerImage: 'python:3.10',
         dockerArgs: '-v /cache:/root/.cache',
@@ -56,7 +56,7 @@
     try {
         ......
     } catch(err) {
-        sqaTools.handleError(err)
+        customPipeline.handleError(err)
     }
     ```
 ### 2.3 构建结果通知
@@ -72,7 +72,7 @@
 - 调用示例：
 
     ```groovy
-    sqaTools.notifyResult(type: 'UNSTABLE', error: err)
+    customPipeline.notifyResult(type: 'UNSTABLE', error: err)
     ```
 - 模板中已自动集成结果判断与通知逻辑：
     > ***（待优化）无需用户在 Jenkinsfile 中手动处理结果判断。***

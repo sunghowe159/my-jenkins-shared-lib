@@ -1,5 +1,5 @@
 /**
- * sqaTools_CodeSync.groovy
+ * codeSync.groovy
  *
  * 拉取 GitLab 仓库代码：
  *  - 支持单仓拉取（repoUrl + branch）
