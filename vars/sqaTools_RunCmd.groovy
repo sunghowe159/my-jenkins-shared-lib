@@ -8,41 +8,17 @@
  * - 自动判断平台（或强制指定）
  */
 
+@groovy.transform.Field
+def utils = new com.internal.sqa.Utils()
+
 def call(Object arg) {
     Map config = [:]
 
     if (arg instanceof String) {
-        config.script = arg
+        return utils.runCmd([script: arg])
     } else if (arg instanceof Map) {
-        config = arg
+        return utils.runCmd(arg)
     } else {
-        error "[RunCmd] ❌ 参数必须是 String 或 Map"
-    }
-
-    if (!config.script) {
-        error "[RunCmd] ❌ 缺少必填参数 script"
-    }
-
-    def returnStdout = config.get('returnStdout', false)
-    def ignoreError  = config.get('ignoreError', false)
-    def isUnix       = config.containsKey('isUnix') ? config.isUnix : isUnix()
-
-    try {
-        if (isUnix) {
-            return returnStdout ?
-                sh(script: config.script, returnStdout: true).trim() :
-                sh(script: config.script)
-        } else {
-            return returnStdout ?
-                bat(script: config.script, returnStdout: true).trim() :
-                bat(script: config.script)
-        }
-    } catch (err) {
-        if (ignoreError) {
-            echo "[RunCmd] 命令执行失败，忽略错误：${err.getMessage()}"
-            return returnStdout ? '' : null
-        } else {
-            throw err
-        }
+        error "[sqaTools.RunCmd] 参数必须是 String 或 Map"
     }
 }

@@ -1,120 +1,42 @@
-# Jenkins Shared Library - sqaTools 模板说明
-
+# Jenkins Shared Libraries - 用户文档
 ---
-
 ## 1. 介绍
-
-`sqaTools` 是基于 Jenkins Scripted Pipeline 的流水线模板，统一封装了以下功能：
-
-- 节点选择（`node`）
-- Docker 容器运行（根据 `dockerImage` 配置自动启用）
-- 凭证注入（支持多种凭证类型，自动添加默认凭证）
-- 异常捕获与统一处理（`handleError()`）
-- 构建产物归档（可配置归档路径）
-- 构建结果通知（`notifyResult()`，支持 SUCCESS、FAILURE、ABORTED、UNSTABLE 等）
-- Gitlab代码拉取，包括单仓库和多仓库（sqaTools_CodeSync）
-
-该模板旨在为 Jenkins 流水线提供统一的执行环境封装，提升复用和可维护性。
-
----
-
-## 2. 使用方法
-
-### 2.1 引入共享库
-
-在 Jenkinsfile 顶部引入共享库：
+随着越来越多的项目采用流水线，一些通用的模式可能会逐渐出现。为了减少代码冗余，可以在不同项目之间共享流水线的部分功能，这部分共享功能即 Shared Libraries。
+### 1.1 引入共享库
+在 Jenkinsfile 顶部引入共享库，后续流水线中即可调用共享库函数。
 
 ```groovy
 @Library('my-jenkins-shared-lib') _
 ```
-### 2.2 调用流水线模板
-流水线主体代码需符合 Scripted Pipeline 语法规范。
-```groovy
-sqaTools.cicd([
-    nodeLabel: 'ci-node-label',
-    dockerImage: 'python:3.10',
-    dockerArgs: '-v /cache:/root/.cache',
-    credentials: [
-        string(credentialsId: 'your-cred-id', variable: 'TOKEN')
-    ],
-    archiveArtifacts: 'build/output/**/*.zip'
-]) {
-    timeout(time: 30, unit: 'MINUTES') {
-        stage('Build') {
-            sh 'make all'
-        }
-        stage('Test') {
-            sh 'make test'
-        }
-    }
-}
-```
-### 2.3 模板配置参数说明
-|参数	|类型	|说明	|默认值|
-|--|--|--|--|
-|nodeLabel|	String	|Jenkins 执行节点标签|	'build-node'
-|dockerImage|	String	|Docker 镜像名称，非空时启用容器|	''
-|dockerArgs|	String	|Docker 运行参数，如挂载缓存目录等	|''
-|credentials|	List	|Jenkins 凭证列表（支持多种类型）|	[]
-|archiveArtifacts|	String	|构建产物归档路径，支持通配符，逗号分隔|	''
-## 3. 错误处理
-模板内置了异常捕获机制，捕获到异常时会打印错误日志，并自动标记构建状态为失败 (FAILURE)。
+### 1.2  共享库说明
+#### 1.2.1 src目录 —— Groovy 工具类、复用模块
+存放开发的工具类、逻辑组件、数据结构，被 vars/ 或其他 src/ 类引用。
+#### 1.2.2 vars目录 —— 共享库的函数入口
+定义暴露给 Jenkinsfile 使用的函数，每个 .groovy 文件对应一个全局变量；
 
-默认错误处理在 handleError 函数内实现，用户可根据需要扩展该方法，集成通知（飞书、Slack、邮件等）。
-### 3.1 handleError(Exception err)
-模板内部封装的异常处理函数，在流水线异常时被调用，作用包括：
+文件名就是函数名，例如 vars/myStep.groovy → myStep(...)；
 
-捕获错误日志；
+通常包含一个 call() 方法，使其可直接像函数一样被调用。
+#### 1.2.4 resources目录 —— 存放静态文件模板、脚本
+存放脚本、模板、配置文件，可以通过 libraryResource() 加载为字符串
 
-调用 notifyResult(type: 'FAILURE', error: err) 发送失败通知；
+使用相对路径读取：libraryResource('org/example/script.sh')
 
-保留扩展点（如记录错误到日志系统、触发飞书通知等）；
+常用于注入 shell 脚本、Groovy 模板等
+#### 1.2.4 tests目录
+针对本库封装的工具或函数编写的Jenkinsfile示例
+#### 1.2.5 docs目录
+各工具、模板说明文档
 
-保留 handleError() 是为了未来对异常处理进行统一增强。
-## 4. 构建结果通知
-### 4.1 notifyResult(Map args = [:])
-用于发送构建结果通知，支持所有 Jenkins 构建状态：
-
-参数	说明
-type	构建结果类型：SUCCESS、FAILURE、ABORTED、UNSTABLE、NOT_BUILT
-error	可选，传入异常对象（显示异常信息）
-subject	邮件标题（可选）
-body	邮件正文（可选）
-to	收件人邮箱（默认取 NOTIFY_EMAIL_TO）
-调用示例：
-
-```groovy
-sqaTools.notifyResult(type: 'UNSTABLE', error: err)
-```
-### 4.2 模板中通知行为自动化说明
-模板中已自动集成结果判断与通知逻辑：
-
-|场景	|行为|
-|--|--|
-|正常成功	|自动发送成功通知|
-|抛出异常	|调用 handleError()，发送失败通知|
-|构建中止	|自动发送 ABORTED 通知|
-|设置 UNSTABLE	|自动发送不稳定通知|
-
-无需用户在 Jenkinsfile 中手动处理结果判断。
-## 5. sqaTools_CodeSync 使用说明
+## 2. 共享库vars功能说明
+### 2.1 sqaTools 使用说明
+> `sqaTools` 是基于 Jenkins Scripted Pipeline 的流水线工具，统一封装若干功能。详情见文档：[sqaTools](docs/SqaTools.md)
+### 2.2 sqaTools_CodeSync 使用说明
 > 通用 GitLab 代码拉取工具，支持单仓和多仓（并发）拉取，适配 Merge Request 场景与普通分支构建。详情见文档：[sqaTools_CodeSync](docs/RepoSync.md)
-## 6. sqaTools_RunCmd 适用说明
+### 2.3 sqaTools_RunCmd 使用说明
 > 封装 Jenkins 原生 sh / bat，可直接传入字符串或参数 Map，支持多行命令、返回结果等。详情见文档：[sqaTools_RunCmd](docs/RunCmd.md)
-## 7. 环境变量建议
-```groovy
-// 配置收件人
-env.NOTIFY_EMAIL_TO = 'ci-team@example.com'
-```
-或在 Jenkins 系统/文件夹级别统一配置变量。
-## 8. 注意事项
-pipeline 参数的闭包体需遵循 Scripted Pipeline 语法（支持 stage、timeout、sh 等标准步骤）。
 
-Docker 运行环境只会在 node 环境内创建，保证执行环境稳定。
-
-构建产物归档会在流水线完成后执行，无论成功还是失败，确保产物不会丢失。
-
-## 9. 参考文档
+## 3. 参考文档
 [Jenkins用户手册](https://www.jenkins.io/doc/book/getting-started/)
 
 [Groovy文档](https://groovy-lang.org/documentation.html)
