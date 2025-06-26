@@ -22,7 +22,14 @@
         credentials: [
             string(credentialsId: 'your-cred-id', variable: 'TOKEN')
         ],
-        archiveArtifacts: 'build/output/**/*.zip'
+        archiveArtifacts: 'build/output/**/*.zip',
+        triggers: [
+            [type: 'cron', spec: 'H 4 * * 1']
+        ],
+        parameters: [
+            string(name: 'TAG', defaultValue: 'latest'),
+            booleanParam(name: 'DEBUG', defaultValue: false)
+        ]
     ]) {
         timeout(time: 30, unit: 'MINUTES') {
             stage('Build') {
@@ -38,11 +45,13 @@
 
     |参数	|类型	|说明	|默认值|
     |--|--|--|--|
-    |nodeLabel|	String	|Jenkins 执行节点标签|	'build-node'
+    |nodeLabel|	String	|Jenkins 执行节点标签|	'any'
     |dockerImage|	String	|Docker 镜像名称，非空时启用容器|	''
     |dockerArgs|	String	|Docker 运行参数，如挂载缓存目录等	|''
     |credentials|	List	|Jenkins 凭证列表（支持多种类型）|	[]
     |archiveArtifacts|	String	|构建产物归档路径，支持通配符，逗号分隔|	''
+    |triggers|	List	|触发器配置，如 cron、pollSCM|	[]
+    |parameters|	List	|	声明流水线参数（供 UI 和上游传参使用）|	[]
 ### 2.2 错误处理
 - 函数名：`def handleError(Exception err)`
 - 异常处理函数，在流水线异常时被调用，作用包括：

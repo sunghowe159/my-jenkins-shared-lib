@@ -9,7 +9,7 @@
  */
 
 @groovy.transform.Field
-def utils = new com.internal.sqa.Utils()
+def utils = new com.internal.sqa.Utils(this)
 
 def call(Object arg) {
     Map config = [:]

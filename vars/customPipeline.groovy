@@ -1,10 +1,15 @@
 // vars/customPipeline.groovy
 
+@groovy.transform.Field
+def pipeline_config = [:]
+
+@groovy.transform.Field
+def customPipelineCfg = new com.internal.sqa.CustomPipelineCfg(this)
 /**
  * 主流水线模板函数
  * 统一封装 node、docker、凭证、异常捕获和产物归档
  * @param config Map 配置项
- *        nodeLabel: Jenkins节点标签，默认 'build-node'
+ *        nodeLabel: Jenkins节点标签，默认空（使用任意节点）
  *        dockerImage: Docker 镜像名，非空则启用 docker 容器执行
  *        dockerArgs: docker 参数，如 -v 缓存挂载，默认空
  *        credentials: withCredentials 需要的凭证列表，默认空（会自动添加默认凭证）
@@ -12,28 +17,15 @@
  * @param pipeline Closure 具体流水线逻辑，遵守脚本式Pipeline规范
  */
 def run(Map config = [:], Closure pipeline = {}) {
-    def defaultConfig = [
-        nodeLabel: 'build-node',
-        dockerImage: '',
-        dockerArgs: '',
-        credentials: [],
-        archiveArtifacts: ''
-    ]
-
-    def cicd_config = defaultConfig + config
-
-    // 默认凭证添加
-    cicd_config.credentials += [
-        usernamePassword(
-            credentialsId: 'default-git-cred',
-            usernameVariable: 'GIT_USER',
-            passwordVariable: 'GIT_PASS'
-        )
-    ]
-
-    this.binding.setVariable('cicd_config', cicd_config)
-    cicd_code = {
-        withCredentials(cicd_config.credentials) {
+    
+    pipeline_config = config
+    // 注入默认凭证
+    def defaultCreds = customPipelineCfg.getDefaultCredentialsFromResource()
+    pipeline_config.credentials = defaultCreds + (config.credentials ?: [])
+    // 设置流水线属性
+    customPipelineCfg.applyJobProperties(pipeline_config)
+    main_pipeline = {
+        withCredentials(pipeline_config.credentials) {
             def capturedException = null
             try_pipeline = {
                 try {
@@ -47,8 +39,8 @@ def run(Map config = [:], Closure pipeline = {}) {
                     handleError(e)
                     throw e
                 } finally {
-                    if (cicd_config.archiveArtifacts?.trim()) {
-                        archiveArtifacts artifacts: cicd_config.archiveArtifacts, allowEmptyArchive: true
+                    if (pipeline_config.archiveArtifacts?.trim()) {
+                        archiveArtifacts artifacts: pipeline_config.archiveArtifacts, allowEmptyArchive: true
                     }
 
                     // 成功 / 非失败状态，也发送一次结果通知
@@ -57,9 +49,12 @@ def run(Map config = [:], Closure pipeline = {}) {
                     }
                 }
             }
-            if(cicd_config.dockerImage) {
-                runWithDocker(cicd_config) {
-                    try_pipeline()
+            if(pipeline_config.dockerImage) {
+                docker.withRegistry('https://registry.example.com', 'credentials-id') {
+                    docker.image(config.dockerImage).pull() // 确保拉取最新镜像
+                    docker.image(config.dockerImage).inside(config.dockerArgs ?: '') {
+                        try_pipeline()
+                    }
                 }
             } else {
                 try_pipeline()
@@ -67,22 +62,8 @@ def run(Map config = [:], Closure pipeline = {}) {
             
         }
     }
-
-    node(cicd_config.nodeLabel) {
-        cicd_code()
-    }
-}
-
-
-/**
- * 使用 docker 容器运行流水线
- */
-def runWithDocker(Map config, Closure pipeline) {
-    docker.withRegistry('https://registry.example.com', 'credentials-id') {
-        docker.image(config.dockerImage).pull() // 确保拉取最新镜像
-        docker.image(config.dockerImage).inside(config.dockerArgs ?: '') {
-            pipeline()
-        }
+    node(pipeline_config.nodeLabel ?: '') {
+        main_pipeline()
     }
 }
 
