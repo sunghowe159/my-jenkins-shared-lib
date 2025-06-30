@@ -35,8 +35,10 @@
 > 通用 GitLab 代码拉取工具，支持单仓和多仓（并发）拉取，适配 Merge Request 场景与普通分支构建。详情见文档：[codeSync](docs/codeSync.md)
 ### 2.3 runCmd 使用说明
 > 封装 Jenkins 原生 sh / bat，可直接传入字符串或参数 Map，支持多行命令、返回结果等。详情见文档：[runCmd](docs/runCmd.md)
-
-## 3. 参考文档
+## 3.共享库resources/script说明
+### 3.1 build_pipeline.sh 使用说明
+> 该脚本用于触发 Jenkins Job，并实时监控其状态，支持带参触发。详情见文档：[build_pipeline.sh](docs/script/buildPipelineUsage.md)
+## 4. 参考文档
 [Jenkins用户手册](https://www.jenkins.io/doc/book/getting-started/)
 
 [Groovy文档](https://groovy-lang.org/documentation.html)
