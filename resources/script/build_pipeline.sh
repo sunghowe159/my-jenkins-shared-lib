@@ -16,11 +16,11 @@ Options:
   --token, -t <token>           Jenkins API token
   --param, -p <key=value>       Specify build parameter, can repeat multiple times
   --sleep-interval, -s <sec>    Sleep interval between polling (default: 5)
-  --no-build                    Do not trigger build
+  --query                       Query build status (e.g. --query ${BUILD_NUMBER})
   --help                        Show this help message
 
 Examples:
-  $0 -url http://jenkins -path TRANSIT/CU/Prod/tools/Sync -u admin -t xxxx \\
+  $0 -url http://jenkins -path Folder/MyJob -u admin -t xxxx \\
      -p A=a -p B=b -p GERRIT_BRANCH=main -s 3
 
 EOF
@@ -58,12 +58,13 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --sleep-interval|-s)
-            SLEEP_SEC="$2"
+            SLEEP_SEC="${2:-5}"
             shift 2
             ;;
-        --no-build)
+        --query)
             NO_BUILD=true
-            shift
+            BUILD_NUMBER="${2:-lastBuild}"
+            shift 2
             ;;
         *)
             echo "Unknown option: $1"
@@ -75,7 +76,6 @@ done
 # ---------------------------------------------
 # 默认值、路径转换
 # ---------------------------------------------
-SLEEP_SEC="${SLEEP_SEC:-5}"
 # 将 A/B/C 转换为 job/A/job/B/job/C
 if [[ "$JOB_PATH" != job/* ]]; then
     IFS='/' read -ra PARTS <<< "$JOB_PATH"

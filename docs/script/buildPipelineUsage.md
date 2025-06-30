@@ -5,7 +5,7 @@
 bash
 ./build_pipeline.sh \
   --jenkins-url http://jenkins.example.com \
-  --job-path job/Folder/job/MyJob \
+  --job-path Folder/MyJob \
   --user admin \
   --token your_token_here \
   --param GERRIT_BRANCH dev \
@@ -21,7 +21,7 @@ bash
 |--token <token>|	-t	|Jenkins API Token 或密码
 |--param <k> <v>	|-p	|指定参数，可重复添加
 |--sleep-interval <sec>	|-s	|轮询间隔时间，默认 5 秒
-|--no-build	|无	|不触发构建，可用于查询已知流水线状态
+|--query	|无	|不触发构建，用于查询指定build number的流水线状态，默认查询最新一次已完成的构建
 |--help	|无	|查看帮助文档
 
 ## 示例
