@@ -116,13 +116,15 @@ def notifyResult(Map args = [:]) {
 
     def to = args.to ?: env.NOTIFY_EMAIL_TO ?: 'Hao.Song@verisilicon.com'
 
-    emailext(
-        subject: subject,
-        body: body,
-        to: to,
-        mimeType: 'text/plain'
-    )
-
-    echo "📨 构建结果通知 [${resultLabel}] 已发送至 ${to}"
+    // emailext(
+    //     subject: subject,
+    //     body: body,
+    //     to: to,
+    //     mimeType: 'text/plain'
+    // )
+    runCmd('''
+    echo "发送构建结果通知"
+    echo $body
+    ''')
 }
 
