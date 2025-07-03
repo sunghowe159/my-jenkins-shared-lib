@@ -1,5 +1,5 @@
 // vars/customPipeline.groovy
-package com.internal.sqa
+
 @groovy.transform.Field
 def pipeline_config = [:]
 
@@ -46,6 +46,7 @@ def runTask(Map config = [:], Closure pipeline = {}) {
                     if (currentBuild.result != 'FAILURE') {
                         notifyResult(type: currentBuild.result, error: capturedException)
                     }
+                    cleanWs()
                 }
             }
             if(pipeline_config.dockerImage) {
@@ -114,15 +115,14 @@ def notifyResult(Map args = [:]) {
         ${errorMsg ? "\n异常信息: ${errorMsg}" : ""}
     """
 
-    def to = args.to ?: env.NOTIFY_EMAIL_TO ?: 'ci-team@example.com'
+    def to = args.to ?: env.NOTIFY_EMAIL_TO ?: 'Hao.Song@verisilicon.com'
 
-    emailext(
-        subject: subject,
-        body: body,
-        to: to,
-        mimeType: 'text/plain'
-    )
-
-    echo "📨 构建结果通知 [${resultLabel}] 已发送至 ${to}"
+    // emailext(
+    //     subject: subject,
+    //     body: body,
+    //     to: to,
+    //     mimeType: 'text/plain'
+    // )
+    echo "${body}"
 }
 
