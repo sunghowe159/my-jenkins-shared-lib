@@ -1,6 +1,6 @@
-@Library('my-jenkins-shared-lib@master') _
+@Library('my-jenkins-shared-lib@dev') _
 
-customPipeline.runTask([]) {
+customPipeline.runTask([:]) {
     stage('Build') {
         sh 'make'
     }
