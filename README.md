@@ -38,7 +38,11 @@
 ## 3.共享库resources/script说明
 ### 3.1 build_pipeline.sh 使用说明
 > 该脚本用于触发 Jenkins Job，并实时监控其状态，支持带参触发。详情见文档：[build_pipeline.sh](docs/script/buildPipelineUsage.md)
-## 4. 参考文档
+## 4. 测试工具
+基于 JenkinsPipelineUnit （Groovy + Spock/JUnit）来进行单元测试。
+
+在本地模拟流水线运行，测试通过后再上库进行实操，避免多次提交代码。详情见：[howToRunTest](docs/test/howToRunTest.md)
+## 5. 参考文档
 [Jenkins用户手册](https://www.jenkins.io/doc/book/getting-started/)
 
 [Groovy文档](https://groovy-lang.org/documentation.html)
