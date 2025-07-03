@@ -122,9 +122,9 @@ def notifyResult(Map args = [:]) {
     //     to: to,
     //     mimeType: 'text/plain'
     // )
-    runCmd('''
+    runCmd("""
     echo "发送构建结果通知"
-    echo $body
-    ''')
+    echo \${body}
+    """)
 }
 
