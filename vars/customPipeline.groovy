@@ -46,6 +46,7 @@ def runTask(Map config = [:], Closure pipeline = {}) {
                     if (currentBuild.result != 'FAILURE') {
                         notifyResult(type: currentBuild.result, error: capturedException)
                     }
+                    cleanWs()
                 }
             }
             if(pipeline_config.dockerImage) {
@@ -122,9 +123,6 @@ def notifyResult(Map args = [:]) {
     //     to: to,
     //     mimeType: 'text/plain'
     // )
-    runCmd("""
-    echo "发送构建结果通知"
-    echo \${body}
-    """)
+    echo "${body}"
 }
 
