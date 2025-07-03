@@ -13,7 +13,7 @@ class CustomPipelineCfg implements Serializable {
      * 读取默认凭证
      */
     List getDefaultCredentialsFromResource() {
-        def raw = steps.libraryResource('resources/config/default-credentials.json')
+        def raw = steps.libraryResource('config/default-credentials.json')
         def list = new groovy.json.JsonSlurperClassic().parseText(raw)
 
         return list.collect { cred ->
