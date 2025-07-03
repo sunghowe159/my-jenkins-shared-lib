@@ -10,9 +10,13 @@
 ## 3. 如何运行单元测试
 在项目根目录下执行：
 ```bash
-./gradlew tests
+./gradlew test
 ```
-会自动扫描 tests/ 下所有 Test 文件并执行。
+或者
+```cmd
+gradlew.bat test
+```
+会自动扫描 test/ 下所有 Test 文件并执行。
 
 输出将展示所有模拟的 node、stage、sh、withCredentials 等步骤。
 
@@ -79,3 +83,30 @@ helper.registerAllowedMethod('docker.image', [String], { img ->
 })
 ```
 这样所有测试都会自动继承。
+
+## 4. Q&A
+### 4.1 执行 `./gradlew test` 出错 `bash: ./gradlew: 没有那个文件或目录`
+- 检查目录下是否有 gradlew
+在你的库目录下检查是否有：
+
+```nginx
+gradlew
+gradlew.bat
+gradle/
+```
+
+- 如果没有，生成 gradle wrapper
+安装 gradle（本地）
+```bash
+sudo apt install gradle
+```
+- 在项目根目录执行
+```bash
+gradle wrapper
+```
+- 再检查是否生成：
+```pgsql
+gradlew
+gradlew.bat
+gradle/wrapper/gradle-wrapper.properties
+```
