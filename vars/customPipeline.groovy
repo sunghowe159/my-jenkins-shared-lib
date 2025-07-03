@@ -1,5 +1,5 @@
 // vars/customPipeline.groovy
-package com.internal.sqa
+
 @groovy.transform.Field
 def pipeline_config = [:]
 
