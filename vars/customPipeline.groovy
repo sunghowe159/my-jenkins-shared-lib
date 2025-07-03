@@ -114,7 +114,7 @@ def notifyResult(Map args = [:]) {
         ${errorMsg ? "\n异常信息: ${errorMsg}" : ""}
     """
 
-    def to = args.to ?: env.NOTIFY_EMAIL_TO ?: 'ci-team@example.com'
+    def to = args.to ?: env.NOTIFY_EMAIL_TO ?: 'Hao.Song@verisilicon.com'
 
     emailext(
         subject: subject,
