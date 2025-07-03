@@ -1,0 +1,13 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation localGroovy()
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.15'
+}
