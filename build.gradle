@@ -2,12 +2,23 @@ plugins {
     id 'groovy'
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation localGroovy()
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.lesfurets:jenkins-pipeline-unit:1.15'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.10'
+    testImplementation "com.lesfurets:jenkins-pipeline-unit:1.9"
 }
+
+sourceSets {
+    test {
+        groovy {
+            srcDirs = ['test']
+        }
+    }
+}
+
+tasks.withType(Test) {
+    reports.html.destination = file("../tmp/jenkins-lib-test-reports/html")
+    reports.junitXml.destination = file("../tmp/jenkins-lib-test-reports/xml")
+}
+

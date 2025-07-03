@@ -66,3 +66,5 @@
 [Pipeline Steps Reference](https://www.jenkins.io/doc/pipeline/steps/)
 
 [Scripted Pipeline简介](https://www.jenkins.io/doc/book/pipeline/syntax/#scripted-pipeline)
+
+[JenkinsPipelineUnit](https://github.com/jenkinsci/JenkinsPipelineUnit)
