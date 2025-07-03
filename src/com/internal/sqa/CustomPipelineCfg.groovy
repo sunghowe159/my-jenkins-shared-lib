@@ -12,30 +12,30 @@ class CustomPipelineCfg implements Serializable {
     /**
      * 读取默认凭证
      */
-    static List getDefaultCredentialsFromResource() {
-        def raw = libraryResource('config/default-credentials.json')
+    List getDefaultCredentialsFromResource() {
+        def raw = steps.libraryResource('resources/config/default-credentials.json')
         def list = new groovy.json.JsonSlurperClassic().parseText(raw)
 
         return list.collect { cred ->
             switch (cred.type) {
                 case 'usernamePassword':
-                    return usernamePassword(
+                    return steps.usernamePassword(
                         credentialsId: cred.credentialsId,
                         usernameVariable: cred.usernameVariable,
                         passwordVariable: cred.passwordVariable
                     )
                 case 'string':
-                    return string(
+                    return steps.string(
                         credentialsId: cred.credentialsId,
                         variable: cred.variable
                     )
                 case 'file':
-                    return file(
+                    return steps.file(
                         credentialsId: cred.credentialsId,
                         variable: cred.variable
                     )
                 case 'sshUserPrivateKey':
-                    return sshUserPrivateKey(
+                    return steps.sshUserPrivateKey(
                         credentialsId: cred.credentialsId,
                         keyFileVariable: cred.keyFileVariable,
                         passphraseVariable: cred.passphraseVariable,

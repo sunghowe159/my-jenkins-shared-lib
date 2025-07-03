@@ -1,10 +1,8 @@
 // vars/customPipeline.groovy
-
+package com.internal.sqa
 @groovy.transform.Field
 def pipeline_config = [:]
 
-@groovy.transform.Field
-def customPipelineCfg = new com.internal.sqa.CustomPipelineCfg(this)
 /**
  * 主流水线模板函数
  * 统一封装 node、docker、凭证、异常捕获和产物归档
@@ -16,18 +14,19 @@ def customPipelineCfg = new com.internal.sqa.CustomPipelineCfg(this)
  *        archiveArtifacts: 构建产物归档路径，空则不归档
  * @param pipeline Closure 具体流水线逻辑，遵守脚本式Pipeline规范
  */
-def run(Map config = [:], Closure pipeline = {}) {
+def runTask(Map config = [:], Closure pipeline = {}) {
     
     pipeline_config = config
+    def customPipelineCfg = new com.internal.sqa.CustomPipelineCfg(this)
     // 注入默认凭证
     def defaultCreds = customPipelineCfg.getDefaultCredentialsFromResource()
     pipeline_config.credentials = defaultCreds + (config.credentials ?: [])
     // 设置流水线属性
     customPipelineCfg.applyJobProperties(pipeline_config)
-    main_pipeline = {
+    def main_pipeline = {
         withCredentials(pipeline_config.credentials) {
             def capturedException = null
-            try_pipeline = {
+            def try_pipeline = {
                 try {
                     pipeline() 
                     if (!currentBuild.result) {
