@@ -19,6 +19,7 @@ customPipeline.runTask([
     ])
     stage('Build') {
         runCmd('''
+        mkdir -p build,test
         echo 'start building' > build/build.log
         uname -a
         ''')
