@@ -2,9 +2,13 @@
 
 customPipeline.runTask([:]) {
     stage('Build') {
-        sh 'make'
+        runCmd('''
+        echo 'start building'
+        ''')
     }
     stage('Test') {
-        sh 'make test'
+        runCmd('''
+        echo 'start testing'
+        ''')
     }
 }
